@@ -1,0 +1,27 @@
+import { ValidationError as ValidationErr } from "class-validator";
+import { NextFunction, Request, Response } from "express";
+
+export class ValidationError extends Error {
+  constructor(public validationError: ValidationErr[]) {
+    super();
+    this.name = 'ValidationError';
+    this.message = validationError.map(err => Object.values(err.constraints as any)).flat().join('; ');
+  }
+}
+
+export const validationErrorHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
+  if (err instanceof ValidationError) {
+    res.status(400);
+    res.json({
+      name: err.name,
+      message: err.message,
+      details: err.validationError.map(err => ({
+        property: err.property,
+        constraints: err.constraints,
+        value: err.value
+      }))
+    });
+  } else {
+    next(err);
+  }
+}
