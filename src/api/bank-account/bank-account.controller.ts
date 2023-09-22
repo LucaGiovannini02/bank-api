@@ -6,6 +6,7 @@ import bankAccountService from "./bank-account.service";
 export let add = async (req: TypedRequest<AddBankAccount, any>, res: Response, next: NextFunction) => {
   try {
     let newBankAccount = await bankAccountService.add(req.user?.id!);
+    console.log(newBankAccount);
     res.json(newBankAccount);
   }
   catch (err) {
