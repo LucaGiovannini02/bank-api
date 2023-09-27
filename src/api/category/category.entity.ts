@@ -4,4 +4,5 @@ export interface Category {
   id?: string;
   category: string;
   type: string;
+  uid: string;
 }

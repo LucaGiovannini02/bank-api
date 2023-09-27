@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import authRouter from './auth/auth.router';
-import transactionRouter from './newtransactions/transaction.router';
+import transactionRouter from './transactions/transaction.router';
 
 const router = Router();
 

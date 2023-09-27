@@ -11,5 +11,5 @@ export interface Transaction {
   sender?: iBankAccount | Types.ObjectId;
   receiver?: iBankAccount | Types.ObjectId;
   transactionCategory?: iCategory | Types.ObjectId;
-  // bankAccountID?: iBankAccount | Types.ObjectId;
+  bankAccountID?: iBankAccount | Types.ObjectId;
 }

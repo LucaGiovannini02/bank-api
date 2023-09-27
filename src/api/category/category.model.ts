@@ -4,6 +4,7 @@ import { Category as iCategory } from './category.entity';
 export const categorySchema = new mongoose.Schema<iCategory>({
   category: String,
   type: String,
+  uid: String,
 });
 
 categorySchema.set('toJSON', {
