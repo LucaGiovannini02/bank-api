@@ -1,13 +1,15 @@
-import mongoose, { Schema, model } from 'mongoose';
-import { Transaction as iTransaction } from './transactions.entity';
+import { Schema, model } from 'mongoose';
+import { Transaction as ITransaction } from './transaction.entity';
 
-export const transactionSchema = new mongoose.Schema<iTransaction>({
+export const transactionSchema = new Schema<ITransaction>({
   amount: Number,
   balance: Number,
   date: Date,
   description: String,
-  bankAccount: { type: Schema.Types.ObjectId, ref: 'BankAccount' },
+  sender: { type: Schema.Types.ObjectId, ref: 'BankAccount' },
+  receiver: { type: Schema.Types.ObjectId, ref: 'BankAccount' },
   transactionCategory: { type: Schema.Types.ObjectId, ref: 'Category' },
+  // bankAccountID: { type: Schema.Types.ObjectId, ref: 'BankAccount' },
 });
 
 transactionSchema.set('toJSON', {
@@ -28,7 +30,7 @@ transactionSchema.set('toObject', {
   },
 });
 
-export const Transaction = model<iTransaction>(
-  'BankAccountTransaction',
+export const Transaction = model<ITransaction>(
+  'Transaction',
   transactionSchema
 );

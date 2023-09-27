@@ -1,0 +1,379 @@
+import { Transaction as iTransaction } from './transaction.entity';
+import { BankAccount as iBankAccount } from '../bank-account/bank-account.entity';
+
+export class TransactionService {
+  async createTransaction(
+    sender: iBankAccount,
+    receiver: iBankAccount,
+    amount: number
+  ): Promise<iTransaction> {
+    // You can implement the logic to create a transaction here
+    // For simplicity, we'll just return a dummy transaction object
+    const transaction: iTransaction = {
+      sender,
+      receiver,
+      amount,
+      // Other properties you may want to set
+    };
+
+    return transaction;
+  }
+}
+
+export default new TransactionService();
+
+import { Transaction as iTransaction } from './transaction.entity';
+import { Transaction } from './transaction.model'; // Import the Mongoose model
+import { BankAccount } from '../bank-account/bank-account.model';
+
+export class TransactionService {
+  async createTransaction(
+    senderIBAN: string,
+    receiverIBAN: string,
+    amount: number
+  ): Promise<iTransaction> {
+    try {
+      // Get the sender and receiver bank accounts using populate
+      const senderAccount = await BankAccount.findOne({ iban: senderIBAN });
+      const receiverAccount = await BankAccount.findOne({ iban: receiverIBAN });
+
+      // Calculate the new balance (assuming you have a logic for this)
+      const newBalance = 0 + amount; // Change this to calculate the actual balance
+
+      // Create a new transaction document using the Mongoose model
+      const transaction = new Transaction({
+        amount,
+        balance: newBalance,
+        date: new Date(), // Generate the current date
+        sender: senderAccount,
+        receiver: receiverAccount,
+        // You can set other properties here
+      });
+
+      // Save the transaction to the database
+      await transaction.save();
+
+      // Return the saved transaction
+      return transaction;
+    } catch (error) {
+      // Handle any errors that occur during the save operation
+      throw error; // You may want to handle the error more gracefully in a production application
+    }
+  }
+}
+
+export default new TransactionService();
+
+import { BankAccount } from '../bank-account/bank-account.model';
+import { Transaction as iTransaction } from './transaction.entity';
+import { Transaction } from './transaction.model';
+
+export class TransactionService {
+  async createTransaction(
+    senderIBAN: string,
+    receiverIBAN: string,
+    amount: number
+  ): Promise<iTransaction[]> {
+    try {
+      // Get the sender and receiver bank accounts using populate
+      const senderAccount = await BankAccount.findOne({ iban: senderIBAN });
+      const receiverAccount = await BankAccount.findOne({ iban: receiverIBAN });
+
+      // Calculate the new balances
+      const senderNewBalance = senderAccount.balance - amount;
+      const receiverNewBalance = receiverAccount.balance + amount;
+
+      // Create transactions for sender and receiver
+      const senderTransaction = new Transaction({
+        amount: -amount,
+        balance: senderNewBalance,
+        date: new Date(),
+        sender: senderAccount,
+        receiver: receiverAccount,
+        // Other properties you may want to set
+      });
+
+      const receiverTransaction = new Transaction({
+        amount,
+        balance: receiverNewBalance,
+        date: new Date(),
+        sender: senderAccount,
+        receiver: receiverAccount,
+        // Other properties you may want to set
+      });
+
+      // Save both transactions to the database
+      await senderTransaction.save();
+      await receiverTransaction.save();
+
+      // Return both saved transactions
+      return [senderTransaction, receiverTransaction];
+    } catch (error) {
+      // Handle any errors that occur during the save operation
+      throw error; // You may want to handle the error more gracefully in a production application
+    }
+  }
+}
+
+export default new TransactionService();
+
+import { BankAccount } from '../bank-account/bank-account.model';
+import { Transaction as iTransaction } from './transaction.entity';
+import { Transaction } from './transaction.model';
+
+export class TransactionService {
+  async createTransaction(
+    senderIBAN: string,
+    receiverIBAN: string,
+    amount: number
+  ): Promise<iTransaction[]> {
+    try {
+      // Get the sender and receiver bank accounts using populate
+      const senderAccount = await BankAccount.findOne({ iban: senderIBAN });
+      const receiverAccount = await BankAccount.findOne({ iban: receiverIBAN });
+
+      const senderLastTransaction = await Transaction.findOne({});
+      const receiverLastTransaction = await Transaction.findOne({});
+
+      // Retrieve the sender's and receiver's balances or default to 0
+      const senderBalance = senderLastTransaction
+        ? senderLastTransaction.balance
+        : 0;
+      const receiverBalance = receiverLastTransaction
+        ? receiverLastTransaction.balance
+        : 0;
+
+      // Calculate the new balances
+      const senderNewBalance = senderBalance - amount;
+      const receiverNewBalance = receiverBalance + amount;
+
+      // Create transactions for sender and receiver
+      const senderTransaction = new Transaction({
+        amount: -amount,
+        balance: senderNewBalance,
+        date: new Date(),
+        sender: senderAccount,
+        receiver: receiverAccount,
+        BankAccount: senderAccount._id,
+        // Other properties you may want to set
+      });
+
+      const receiverTransaction = new Transaction({
+        amount,
+        balance: receiverNewBalance,
+        date: new Date(),
+        sender: senderAccount,
+        receiver: receiverAccount,
+        BankAccount: receiverAccount._id,
+        // Other properties you may want to set
+      });
+
+      // Save both transactions to the database
+      await senderTransaction.save();
+      await receiverTransaction.save();
+
+      // Return both saved transactions
+      return [senderTransaction, receiverTransaction];
+    } catch (error) {
+      // Handle any errors that occur during the save operation
+      throw error; // You may want to handle the error more gracefully in a production application
+    }
+  }
+}
+
+export default new TransactionService();
+
+import { BankAccount } from '../bank-account/bank-account.model';
+import { Transaction as iTransaction } from './transaction.entity';
+import { Transaction } from './transaction.model';
+
+export class TransactionService {
+  async createTransaction(
+    senderIBAN: string,
+    receiverIBAN: string,
+    amount: number
+  ): Promise<iTransaction[]> {
+    try {
+      Get the sender and receiver bank accounts using populate
+      const senderAccount = await BankAccount.findOne({ iban: senderIBAN });
+      const receiverAccount = await BankAccount.findOne({ iban: receiverIBAN });
+
+      const senderLastTransaction = await Transaction.findOne({
+        sender: senderAccount,
+      }).sort({ date: -1 });
+      const receiverLastTransaction = await Transaction.findOne({
+        receiver: receiverAccount,
+      }).sort({ date: -1 });
+
+      Retrieve the sender's and receiver's balances or default to 0
+      const senderBalance = senderLastTransaction
+        ? senderLastTransaction.balance
+        : 0;
+      const receiverBalance = receiverLastTransaction
+        ? receiverLastTransaction.balance
+        : 0;
+
+      Calculate the new balances
+      const senderNewBalance = senderBalance! - amount;
+      const receiverNewBalance = receiverBalance! + amount;
+
+      const senderTransaction = new Transaction({
+        amount: -amount,
+        balance: senderNewBalance,
+        date: new Date(),
+        sender: senderAccount,
+        receiver: receiverAccount,
+        bankAccountID: senderAccount?._id,
+      });
+
+      const receiverTransaction = new Transaction({
+        amount,
+        balance: receiverNewBalance,
+        date: new Date(),
+        sender: senderAccount,
+        receiver: receiverAccount,
+        bankAccountID: receiverAccount?.id,
+      });
+
+      Save both transactions to the database
+      await senderTransaction.save();
+      await receiverTransaction.save();
+
+      Return both saved transactions
+      return [senderTransaction, receiverTransaction];
+    } catch (error) {
+      Handle any errors that occur during the save operation
+      throw error; // You may want to handle the error more gracefully in a production application
+    }
+  }
+}
+
+export default new TransactionService();
+
+import { BankAccount } from '../bank-account/bank-account.model';
+import { Transaction as iTransaction } from './transaction.entity';
+import { Transaction } from './transaction.model';
+
+export class TransactionService {
+  async createTransaction(
+    senderIBAN: string,
+    receiverIBAN: string,
+    amount: number
+  ): Promise<iTransaction[]> {
+    try {
+      // Get the sender and receiver bank accounts using populate
+      const senderAccount = await BankAccount.findOne({ iban: senderIBAN });
+      const receiverAccount = await BankAccount.findOne({ iban: receiverIBAN });
+
+      const senderBalance = senderAccount?.balance;
+
+      const receiverBalance = receiverAccount?.balance;
+
+      // Calculate the new balances
+      const senderNewBalance = senderBalance - amount;
+      const receiverNewBalance = receiverBalance + amount;
+
+      // Create transactions for sender and receiver
+      const senderTransaction = new Transaction({
+        amount: -amount,
+        balance: senderNewBalance,
+        date: new Date(),
+        sender: senderAccount,
+        receiver: receiverAccount,
+        bankAccount: senderAccount._id, // Add bankAccount property
+        // Other properties you may want to set
+      });
+
+      const receiverTransaction = new Transaction({
+        amount,
+        balance: receiverNewBalance,
+        date: new Date(),
+        sender: senderAccount,
+        receiver: receiverAccount,
+        bankAccount: receiverAccount._id, // Add bankAccount property
+        // Other properties you may want to set
+      });
+
+      // Save both transactions to the database
+      await senderTransaction.save();
+      await receiverTransaction.save();
+
+      // Return both saved transactions
+      return [senderTransaction, receiverTransaction];
+    } catch (error) {
+      // Handle any errors that occur during the save operation
+      throw error; // You may want to handle the error more gracefully in a production application
+    }
+  }
+}
+
+export default new TransactionService();
+
+import { BankAccount as iBankAccount } from '../bank-account/bank-account.model';
+import { Transaction as iTransaction } from './transaction.entity';
+import { Transaction } from './transaction.model';
+
+export class TransactionService {
+  async createTransaction(
+    senderIBAN: string,
+    receiverIBAN: string,
+    amount: number
+  ): Promise<iTransaction[]> {
+    try {
+      // Get the sender and receiver bank accounts using populate
+      // Get the sender and receiver bank accounts using populate
+      const senderAccount = await iBankAccount.findOne({ iban: senderIBAN });
+      const receiverAccount = await iBankAccount.findOne({ iban: receiverIBAN });
+
+      if (!senderAccount || !receiverAccount) {
+        throw new Error('Sender or receiver bank account not found.');
+      }
+
+      const senderLastTransaction = await Transaction.findOne({});
+      const receiverLastTransaction = await Transaction.findOne({});
+
+      // Retrieve the sender's and receiver's balances or default to 0
+      const senderBalance = senderLastTransaction
+        ? senderLastTransaction.balance
+        : 0;
+      const receiverBalance = receiverLastTransaction
+        ? receiverLastTransaction.balance
+        : 0;
+
+      // Calculate the new balances
+      const senderNewBalance = senderAccount.balance - amount;
+      const receiverNewBalance = receiverAccount.balance + amount;
+
+      // Create transactions for sender and receiver
+      const senderTransaction = new Transaction({
+        amount: -amount,
+        balance: senderNewBalance,
+        date: new Date(),
+        sender: senderAccount,
+        receiver: receiverAccount,
+        bankAccountID: senderAccount?._id,
+      });
+
+      const receiverTransaction = new Transaction({
+        amount,
+        balance: receiverNewBalance,
+        date: new Date(),
+        sender: senderAccount,
+        receiver: receiverAccount,
+        bankAccountID: receiverAccount?._id,
+      });
+
+      // Save both transactions to the database
+      await senderTransaction.save();
+      await receiverTransaction.save();
+
+      // Return both saved transactions
+      return [senderTransaction, receiverTransaction];
+    } catch (error) {
+      // Handle any errors that occur during the save operation
+      throw error; // You may want to handle the error more gracefully in a production application
+    }
+  }
+}
+
+export default new TransactionService();

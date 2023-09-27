@@ -7,6 +7,7 @@ export interface Transaction {
   amount: number;
   balance: number;
   date: Date;
+  description: string;
   bankAccount: BankAccount | Types.ObjectId | string;
-  transactionCategory: Category | Types.ObjectId | string;
+  transactionCategory: Category | Types.ObjectId ;
 }
