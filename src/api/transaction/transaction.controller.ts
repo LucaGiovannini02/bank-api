@@ -1,6 +1,11 @@
 import { NextFunction, Request, Response } from 'express';
 import { Transaction as iTransaction } from './transaction.entity';
 import TransactionService from './transaction.service';
+<<<<<<< HEAD
+=======
+import { BankAccount } from '../bank-account/bank-account.model';
+import { Transaction } from './transaction.model';
+>>>>>>> f8980605da38f655946263595023235c0d34455f
 
 export const createBankTransfer = async (
   req: Request,
@@ -22,13 +27,3 @@ export const createBankTransfer = async (
     next(error);
   }
 };
-
-// export const bankTransfer = async(
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   try {
-
-//   }
-// }
