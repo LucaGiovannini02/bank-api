@@ -6,6 +6,7 @@ export interface Transaction {
   id?: string;
   amount: number;
   balance?: number;
+  phoneNumber?: string;
   date?: Date;
   description?: string;
   sender?: iBankAccount | Types.ObjectId;

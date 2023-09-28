@@ -24,6 +24,7 @@ export const add = async (
     const newBankAccount = await bankAccountService.add(newUser.id!);
     await transactionService.bankAccountOpeningTransaction(newBankAccount.id);
     await transactionService.firstDepositTransaction(newBankAccount.id);
+    logService.registerUserLog(newUser.id!, req.ip, true);
     res.send(newBankAccount);
   } catch (err) {
     if (err instanceof UserExistsError) {
@@ -53,7 +54,7 @@ export const login = async (
       return;
     }
     const token = jwt.sign(user, JWT_SECRET, { expiresIn: '7 days' });
-    logService.addUserLog(user?.id, req.ip, true);
+    logService.loginUserLog(user?.id, req.ip, true);
     res.status(200);
     res.json({
       user,

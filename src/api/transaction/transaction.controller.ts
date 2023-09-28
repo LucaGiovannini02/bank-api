@@ -1,11 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { Transaction as iTransaction } from './transaction.entity';
 import TransactionService from './transaction.service';
-<<<<<<< HEAD
-=======
-import { BankAccount } from '../bank-account/bank-account.model';
-import { Transaction } from './transaction.model';
->>>>>>> f8980605da38f655946263595023235c0d34455f
+import logService from '../log/log.service';
 
 export const createBankTransfer = async (
   req: Request,
@@ -23,6 +19,26 @@ export const createBankTransfer = async (
     );
 
     res.status(201).json(transaction);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const phoneRecharge = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { phoneNumber, senderIban, amount, userId } = req.body;
+    // Assuming you have a createTransaction method in your service
+    const phoneRecharge: iTransaction[] = await TransactionService.phoneRecharge(
+      phoneNumber,
+      senderIban,
+      amount,
+    );
+    logService.addPhoneLog(userId, req.ip, true);
+    res.status(201).json(phoneRecharge);
   } catch (error) {
     next(error);
   }

@@ -2,10 +2,12 @@ import { FilterQuery } from 'mongoose';
 import { BankAccount } from '../bank-account/bank-account.model';
 import { Transaction as iTransaction } from './transaction.entity';
 import { Transaction } from './transaction.model';
+import logService from '../log/log.service';
 
 function randomDepositAmount(minAmount: number, maxAmount: number) {
   const randomAmount =
     Math.floor(Math.random() * (maxAmount - minAmount + 1)) + minAmount;
+    return randomAmount;
 }
 export class TransactionService {
   async firstDepositTransaction(id: string | undefined): Promise<iTransaction> {
@@ -142,6 +144,65 @@ export class TransactionService {
 
       // Return both saved transactions
       return [senderTransaction, receiverTransaction];
+    } catch (error) {
+      // Handle any errors that occur during the save operation
+      throw error; // You may want to handle the error more gracefully in a production application
+    }
+  }
+
+  async phoneRecharge(
+    phoneNumber: string,
+    senderIban: string,
+    amount: number
+  ): Promise<iTransaction[]> {
+    try {
+      // Get the sender account using populate
+      const senderAccount = await BankAccount.findOne({ iban: senderIban });
+
+      // Find the last transaction for sender account
+      const senderLastTransaction = await Transaction.findOne({
+        bankAccountID: senderAccount?._id,
+      }).sort({ date: -1, _id: -1 }); // Sort by date and _id in descending order
+
+      // Ensure the sender account exist
+      if (!senderAccount) {
+        throw new Error('Sender account not found');
+      }
+
+      // Ensure the sender account have a non-zero balance
+      if (
+        !senderLastTransaction?.balance ||
+        senderLastTransaction.balance === 0
+      ) {
+        throw new Error('Sender account has zero balance');
+      }
+
+      // Calculate the new balances
+      const senderBalance = senderLastTransaction.balance;
+
+      // Check if sender has sufficient funds for the transfer
+      if (amount > senderBalance) {
+        throw new Error('Insufficient funds in the sender account');
+      }
+
+      const senderNewBalance = senderBalance - amount;
+
+      // Create transactions for sender
+      const senderTransaction = new Transaction({
+        amount: -amount,
+        balance: senderNewBalance,
+        date: new Date(),
+        sender: senderAccount,
+        phoneNumber: phoneNumber,
+        transactionCategory: 'phone_recharge',
+        bankAccountID: senderAccount?._id,
+      });
+
+      // Save both transactions to the database
+      await senderTransaction.save();
+
+      // Return saved transaction
+      return [senderTransaction];
     } catch (error) {
       // Handle any errors that occur during the save operation
       throw error; // You may want to handle the error more gracefully in a production application

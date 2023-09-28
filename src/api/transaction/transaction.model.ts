@@ -6,6 +6,7 @@ export const transactionSchema = new Schema<ITransaction>({
   balance: Number,
   date: Date,
   description: String,
+  phoneNumber: String,
   sender: { type: Schema.Types.ObjectId, ref: 'BankAccount' },
   receiver: { type: Schema.Types.ObjectId, ref: 'BankAccount' },
   transactionCategory: String,
