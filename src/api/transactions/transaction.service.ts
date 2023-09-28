@@ -1,7 +1,12 @@
+import { FilterQuery } from 'mongoose';
 import { BankAccount } from '../bank-account/bank-account.model';
 import { Transaction as iTransaction } from './transaction.entity';
 import { Transaction } from './transaction.model';
 
+function randomDepositAmount(minAmount: number, maxAmount: number) {
+  const randomAmount =
+    Math.floor(Math.random() * (maxAmount - minAmount + 1)) + minAmount;
+}
 export class TransactionService {
   async firstDepositTransaction(id: string | undefined): Promise<iTransaction> {
     try {
@@ -11,22 +16,11 @@ export class TransactionService {
       if (!bankAccount) {
         throw new Error('Bank account not found.');
       }
-
-      // Generate a random deposit amount (between 100 and 1000)
-      const minAmount = 100;
-      const maxAmount = 1000;
-      const randomAmount =
-        Math.floor(Math.random() * (maxAmount - minAmount + 1)) + minAmount;
-
-      // Ensure the balance property is treated as a number
-      const currentBalance = Number(bankAccount.balance || 0);
-
-      // Calculate the new balance after the deposit
-      const newBalance = currentBalance + randomAmount;
+      const newBalance = randomDepositAmount(100, 1000);
 
       // Create a transaction for the first deposit
       const depositTransaction = new Transaction({
-        amount: randomAmount,
+        amount: newBalance,
         balance: newBalance,
         date: new Date(),
         sender: bankAccount,
@@ -89,11 +83,11 @@ export class TransactionService {
 
       // Find the last transaction for sender and receiver accounts
       const senderLastTransaction = await Transaction.findOne({
-        sender: senderAccount?._id,
+        bankAccountID: senderAccount?._id,
       }).sort({ date: -1, _id: -1 }); // Sort by date and _id in descending order
 
       const receiverLastTransaction = await Transaction.findOne({
-        receiver: receiverAccount?._id,
+        bankAccountID: receiverAccount?._id,
       }).sort({ date: -1, _id: -1 }); // Sort by date and _id in descending order
 
       // Ensure the sender and receiver accounts exist
@@ -104,16 +98,14 @@ export class TransactionService {
       // Ensure the sender and receiver accounts have a non-zero balance
       if (
         !senderLastTransaction?.balance ||
-        senderLastTransaction.balance === 0 ||
-        !receiverLastTransaction?.balance ||
-        receiverLastTransaction.balance === 0
+        senderLastTransaction.balance === 0
       ) {
-        throw new Error('Sender or receiver account has zero balance');
+        throw new Error('Sender account has zero balance');
       }
 
       // Calculate the new balances
       const senderBalance = senderLastTransaction.balance;
-      const receiverBalance = receiverLastTransaction.balance;
+      const receiverBalance = receiverLastTransaction!.balance;
 
       // Check if sender has sufficient funds for the transfer
       if (amount > senderBalance) {
@@ -121,7 +113,7 @@ export class TransactionService {
       }
 
       const senderNewBalance = senderBalance - amount;
-      const receiverNewBalance = receiverBalance + amount;
+      const receiverNewBalance = receiverBalance! + amount;
 
       // Create transactions for sender and receiver
       const senderTransaction = new Transaction({
@@ -131,7 +123,7 @@ export class TransactionService {
         sender: senderAccount,
         receiver: receiverAccount,
         transactionCategory: 'bonifico_in_uscita',
-        BankAccount: senderAccount?._id,
+        bankAccountID: senderAccount?._id,
       });
 
       const receiverTransaction = new Transaction({
@@ -141,7 +133,7 @@ export class TransactionService {
         sender: senderAccount,
         receiver: receiverAccount,
         transactionCategory: 'bonifico_in_entrata',
-        BankAccount: receiverAccount?._id,
+        bankAccountID: receiverAccount?._id,
       });
 
       // Save both transactions to the database

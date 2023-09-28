@@ -5,7 +5,6 @@ export const bankAccountSchema = new mongoose.Schema<iBankAccount>({
   user: { type: Schema.Types.ObjectId, ref: 'User' },
   openingDate: Date,
   iban: String,
-  balance: Number,
 });
 
 bankAccountSchema.set('toJSON', {

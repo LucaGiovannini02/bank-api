@@ -8,7 +8,6 @@ export class BankAccountService {
     bankAccount.openingDate = new Date();
     bankAccount.iban = generateIban(22);
     bankAccount.user = userId;
-    bankAccount.balance = 0;
     let newBankAccount = await BankAccountModel.create({ ...bankAccount });
     return await newBankAccount.populate(['user']);
   }

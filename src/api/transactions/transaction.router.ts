@@ -1,9 +1,13 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../../utils/auth/authenticated.middleware';
-import { createBankTransfer } from './transaction.controller';
+import {
+  createBankTransfer,
+  getTransactionById,
+} from './transaction.controller';
 
 const router = Router();
 router.use(isAuthenticated);
-router.post('', createBankTransfer);
+router.post('/bank-transfer', createBankTransfer);
+router.get('', getTransactionById);
 
 export default router;
