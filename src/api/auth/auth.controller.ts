@@ -8,7 +8,7 @@ import passport from 'passport';
 import * as jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '../../utils/auth/jwt/jwt-strategy';
 import bankAccountService from '../bank-account/bank-account.service';
-import transactionService from '../transactions/transaction.service';
+import transactionService from '../transaction/transaction.service';
 
 export const add = async (
   req: TypedRequest<AddUserDTO>,

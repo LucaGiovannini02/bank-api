@@ -1,6 +1,6 @@
 import { Types } from 'mongoose';
 import { User } from '../user/user.entity';
-import { Transaction } from '../transactions/transaction.entity';
+import { Transaction } from '../transaction/transaction.entity';
 
 export interface BankAccount {
   id?: string;
