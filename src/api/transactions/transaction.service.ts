@@ -90,10 +90,11 @@ export class TransactionService {
       // Find the last transaction for sender and receiver accounts
       const senderLastTransaction = await Transaction.findOne({
         sender: senderAccount?._id,
-      }).sort({ date: -1 }); // Sort by date in descending order to get the last transaction
+      }).sort({ date: -1, _id: -1 }); // Sort by date and _id in descending order
+
       const receiverLastTransaction = await Transaction.findOne({
         receiver: receiverAccount?._id,
-      }).sort({ date: -1 });
+      }).sort({ date: -1, _id: -1 }); // Sort by date and _id in descending order
 
       // Ensure the sender and receiver accounts exist
       if (!senderAccount || !receiverAccount) {
@@ -145,7 +146,6 @@ export class TransactionService {
 
       // Save both transactions to the database
       await senderTransaction.save();
-
       await receiverTransaction.save();
 
       // Return both saved transactions

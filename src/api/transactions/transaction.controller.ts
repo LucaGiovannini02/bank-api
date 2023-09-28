@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { Transaction as iTransaction } from './transaction.entity';
 import TransactionService from './transaction.service';
+import { async } from 'rxjs';
 
 export const createBankTransfer = async (
   req: Request,
@@ -22,3 +23,13 @@ export const createBankTransfer = async (
     next(error);
   }
 };
+
+// export const bankTransfer = async(
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ) => {
+//   try {
+
+//   }
+// }
