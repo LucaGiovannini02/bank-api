@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { Transaction as iTransaction } from './transaction.entity';
 import TransactionService from './transaction.service';
 import logService from '../log/log.service';
+import { BankAccount } from '../bank-account/bank-account.model';
 
 export const createBankTransfer = async (
   req: Request,
@@ -30,11 +31,15 @@ export const phoneRecharge = async (
   next: NextFunction
 ) => {
   try {
-    const { phoneNumber, senderIban, amount, userId } = req.body;
-    // Assuming you have a createTransaction method in your service
+    const { phoneNumber, senderIban, amount } = req.body;
     const phoneRecharge: iTransaction[] =
       await TransactionService.phoneRecharge(phoneNumber, senderIban, amount);
-    logService.addPhoneLog(userId, req.ip, true);
+    const senderAccount = await BankAccount.findOne({ iban: senderIban });
+    let userId = senderAccount?.user?.toString();
+    if (userId == undefined) {
+      userId = 'null';
+    }
+    await logService.addPhoneLog(userId, req.ip, true);
     res.status(201).json(phoneRecharge);
   } catch (error) {
     next(error);
