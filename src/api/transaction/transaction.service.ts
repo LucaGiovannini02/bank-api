@@ -7,10 +7,27 @@ import logService from '../log/log.service';
 function randomDepositAmount(minAmount: number, maxAmount: number) {
   const randomAmount =
     Math.floor(Math.random() * (maxAmount - minAmount + 1)) + minAmount;
-    return randomAmount;
+  return randomAmount;
 }
 
 export class TransactionService {
+  async getBalance(bankAccountId: string) {
+    try {
+      const lastOperation = await Transaction.findOne({
+        bankAccountID: bankAccountId,
+      }).sort({ date: -1 });
+
+      if (!lastOperation) {
+        return null;
+      }
+
+      const balance = lastOperation.balance;
+
+      return balance;
+    } catch (error) {
+      throw error;
+    }
+  }
   async getTransactionsWithFilters(
     bankAccount: string,
     query: any

@@ -7,16 +7,17 @@ import {
   getTransactionDetails,
   getTransactionsByBankAccount,
   getTransactionsWithFilters,
+  getAccountBalance,
 } from './transaction.controller';
 
 const router = Router();
 router.use(isAuthenticated);
 router.post('/bank-transfer', createBankTransfer);
 router.post('/phone-recharge', phoneRecharge);
-//router.get('', getTransactionById);
 
 router.get('/:bankAccountId', getTransactionsByBankAccount);
 router.get('/:bankAccountId/:transactionId', getTransactionDetails);
 router.get('/:bankAccountId', getTransactionsWithFilters);
+router.get('/:bankAccountId/balance', getAccountBalance);
 
 export default router;

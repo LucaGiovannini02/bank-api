@@ -24,7 +24,6 @@ export const createBankTransfer = async (
   }
 };
 
-
 export const phoneRecharge = async (
   req: Request,
   res: Response,
@@ -33,11 +32,8 @@ export const phoneRecharge = async (
   try {
     const { phoneNumber, senderIban, amount, userId } = req.body;
     // Assuming you have a createTransaction method in your service
-    const phoneRecharge: iTransaction[] = await TransactionService.phoneRecharge(
-      phoneNumber,
-      senderIban,
-      amount,
-    );
+    const phoneRecharge: iTransaction[] =
+      await TransactionService.phoneRecharge(phoneNumber, senderIban, amount);
     logService.addPhoneLog(userId, req.ip, true);
     res.status(201).json(phoneRecharge);
   } catch (error) {
@@ -46,11 +42,11 @@ export const phoneRecharge = async (
 };
 
 export const getTransactionsByBankAccount = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
     const { bankAccountId } = req.params;
     const transactions = await TransactionService.getTransactionsByBankAccount(
       bankAccountId
@@ -98,6 +94,29 @@ export const getTransactionsWithFilters = async (
     );
 
     res.status(200).json(transactions);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getAccountBalance = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { bankAccountId } = req.params;
+
+    // Call the service method to get the balance
+    const balance = await TransactionService.getBalance(bankAccountId);
+
+    if (balance === null) {
+      return res
+        .status(404)
+        .json({ message: 'No operations found for this bank account' });
+    }
+
+    res.status(200).json({ balance });
   } catch (error) {
     next(error);
   }
