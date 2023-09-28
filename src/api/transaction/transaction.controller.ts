@@ -1,10 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { Transaction as iTransaction } from './transaction.entity';
 import TransactionService from './transaction.service';
-import { BankAccount } from '../bank-account/bank-account.model';
-import { Transaction } from './transaction.model';
-import { TypedRequest } from '../../utils/typed-request.interface';
-import transactionService from './transaction.service';
 
 export const createBankTransfer = async (
   req: Request,

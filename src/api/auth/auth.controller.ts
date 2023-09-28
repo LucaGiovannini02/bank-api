@@ -3,12 +3,14 @@ import { TypedRequest } from '../../utils/typed-request.interface';
 import { AddUserDTO, LoginDTO } from './auth.dto';
 import { omit, pick } from 'lodash';
 import { UserExistsError } from '../../errors/user-exists';
-import userService from '../user/user.service';
+import userService, { UserService } from '../user/user.service';
 import passport from 'passport';
 import * as jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '../../utils/auth/jwt/jwt-strategy';
 import bankAccountService from '../bank-account/bank-account.service';
 import transactionService from '../transaction/transaction.service';
+import logService from '../log/log.service';
+import { UserIdentity } from '../../utils/auth/local/user-identity.model';
 
 export const add = async (
   req: TypedRequest<AddUserDTO>,
@@ -51,6 +53,7 @@ export const login = async (
       return;
     }
     const token = jwt.sign(user, JWT_SECRET, { expiresIn: '7 days' });
+    logService.addUserLog(user?.id, req.ip, true);
     res.status(200);
     res.json({
       user,
