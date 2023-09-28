@@ -24,6 +24,7 @@ export const createBankTransfer = async (
   }
 };
 
+
 export const phoneRecharge = async (
   req: Request,
   res: Response,
@@ -39,6 +40,64 @@ export const phoneRecharge = async (
     );
     logService.addPhoneLog(userId, req.ip, true);
     res.status(201).json(phoneRecharge);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getTransactionsByBankAccount = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+    const { bankAccountId } = req.params;
+    const transactions = await TransactionService.getTransactionsByBankAccount(
+      bankAccountId
+    );
+    res.status(200).json(transactions);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getTransactionDetails = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { bankAccountId, transactionId } = req.params;
+
+    const transaction = await TransactionService.getTransactionDetails(
+      bankAccountId,
+      transactionId
+    );
+
+    if (!transaction) {
+      return res.status(404).json({ message: 'Transaction not found' });
+    }
+
+    res.status(200).json(transaction);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getTransactionsWithFilters = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { bankAccountId } = req.params;
+
+    const transactions = await TransactionService.getTransactionsWithFilters(
+      bankAccountId,
+      req.query
+    );
+
+    res.status(200).json(transactions);
   } catch (error) {
     next(error);
   }

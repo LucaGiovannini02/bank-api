@@ -1,4 +1,4 @@
-import { FilterQuery } from 'mongoose';
+import { FilterQuery, Query } from 'mongoose';
 import { BankAccount } from '../bank-account/bank-account.model';
 import { Transaction as iTransaction } from './transaction.entity';
 import { Transaction } from './transaction.model';
@@ -9,10 +9,66 @@ function randomDepositAmount(minAmount: number, maxAmount: number) {
     Math.floor(Math.random() * (maxAmount - minAmount + 1)) + minAmount;
     return randomAmount;
 }
+
 export class TransactionService {
+  async getTransactionsWithFilters(
+    bankAccount: string,
+    query: any
+  ): Promise<iTransaction[]> {
+    try {
+      const q: FilterQuery<iTransaction> = {
+        bankAccountID: bankAccount,
+      };
+
+      if (query.category) {
+        q.transactionCategory = query.category;
+      }
+
+      if (query.startDate) {
+        q.date['$gte'] = new Date(query.startDate);
+      }
+
+      if (query.endDate) {
+        q.date['$lte'] = new Date(query.endDate);
+      }
+
+      const transactions = await Transaction.find(q)
+        .limit(query.number || 0)
+        .sort({ date: -1 });
+
+      return transactions;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getTransactionDetails(bankAccountId: string, transactionId: string) {
+    try {
+      const transactions = await this.getTransactionsByBankAccount(
+        bankAccountId
+      );
+
+      const transaction = transactions.find((t) => t.id === transactionId);
+
+      return transaction;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getTransactionsByBankAccount(bankAccountId: string) {
+    try {
+      const transactions = await Transaction.find({
+        bankAccountID: bankAccountId,
+      }).populate(['sender', 'receiver', 'transactionCategory']);
+      return transactions;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async firstDepositTransaction(id: string | undefined): Promise<iTransaction> {
     try {
-      // Find the bank account by ID
       const bankAccount = await BankAccount.findById(id);
 
       if (!bankAccount) {
@@ -20,7 +76,6 @@ export class TransactionService {
       }
       const newBalance = randomDepositAmount(100, 1000);
 
-      // Create a transaction for the first deposit
       const depositTransaction = new Transaction({
         amount: newBalance,
         balance: newBalance,
@@ -31,13 +86,11 @@ export class TransactionService {
         bankAccountID: bankAccount._id,
       });
 
-      // Save the transaction to the database
       await depositTransaction.save();
 
       return depositTransaction;
     } catch (error) {
-      // Handle any errors that occur during the save operation
-      throw error; // You may want to handle the error more gracefully in a production application
+      throw error;
     }
   }
 
@@ -45,16 +98,14 @@ export class TransactionService {
     id: string | undefined
   ): Promise<iTransaction> {
     try {
-      // Find the bank account by ID
       const bankAccount = await BankAccount.findById(id);
 
       if (!bankAccount) {
         throw new Error('Bank account not found.');
       }
 
-      // Create a transaction for the bank account opening
       const openingTransaction = new Transaction({
-        amount: 0, // Set the opening balance to 0
+        amount: 0,
         balance: 0,
         date: new Date(),
         sender: bankAccount,
@@ -63,13 +114,11 @@ export class TransactionService {
         bankAccountID: bankAccount._id,
       });
 
-      // Save the transaction to the database
       await openingTransaction.save();
 
       return openingTransaction;
     } catch (error) {
-      // Handle any errors that occur during the save operation
-      throw error; // You may want to handle the error more gracefully in a production application
+      throw error;
     }
   }
 
@@ -79,11 +128,9 @@ export class TransactionService {
     amount: number
   ): Promise<iTransaction[]> {
     try {
-      // Get the sender and receiver bank accounts using populate
       const senderAccount = await BankAccount.findOne({ iban: senderIBAN });
       const receiverAccount = await BankAccount.findOne({ iban: receiverIBAN });
 
-      // Find the last transaction for sender and receiver accounts
       const senderLastTransaction = await Transaction.findOne({
         bankAccountID: senderAccount?._id,
       }).sort({ date: -1, _id: -1 }); // Sort by date and _id in descending order
@@ -92,12 +139,10 @@ export class TransactionService {
         bankAccountID: receiverAccount?._id,
       }).sort({ date: -1, _id: -1 }); // Sort by date and _id in descending order
 
-      // Ensure the sender and receiver accounts exist
       if (!senderAccount || !receiverAccount) {
         throw new Error('Sender or receiver account not found');
       }
 
-      // Ensure the sender and receiver accounts have a non-zero balance
       if (
         !senderLastTransaction?.balance ||
         senderLastTransaction.balance === 0
@@ -105,11 +150,9 @@ export class TransactionService {
         throw new Error('Sender account has zero balance');
       }
 
-      // Calculate the new balances
       const senderBalance = senderLastTransaction.balance;
       const receiverBalance = receiverLastTransaction!.balance;
 
-      // Check if sender has sufficient funds for the transfer
       if (amount > senderBalance) {
         throw new Error('Insufficient funds in the sender account');
       }
@@ -117,7 +160,6 @@ export class TransactionService {
       const senderNewBalance = senderBalance - amount;
       const receiverNewBalance = receiverBalance! + amount;
 
-      // Create transactions for sender and receiver
       const senderTransaction = new Transaction({
         amount: -amount,
         balance: senderNewBalance,
@@ -138,15 +180,12 @@ export class TransactionService {
         bankAccountID: receiverAccount?._id,
       });
 
-      // Save both transactions to the database
       await senderTransaction.save();
       await receiverTransaction.save();
 
-      // Return both saved transactions
       return [senderTransaction, receiverTransaction];
     } catch (error) {
-      // Handle any errors that occur during the save operation
-      throw error; // You may want to handle the error more gracefully in a production application
+      throw error;
     }
   }
 
