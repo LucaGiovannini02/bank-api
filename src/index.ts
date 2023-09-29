@@ -1,16 +1,17 @@
+require('dotenv').config();
 import 'reflect-metadata';
 
 import app from './app';
 import mongoose from 'mongoose';
-
 mongoose.set('debug', true);
-mongoose.connect('mongodb://127.0.0.1:27017/bank') //da definire
-  .then(_ => {
+mongoose
+  .connect(process.env.HOST_DB) //da definire
+  .then((_) => {
     console.log('Connected to db');
-    app.listen(3000, () => {
-      console.log('Server listening on port 3000');
+    app.listen(8080, () => {
+      console.log('Server listening on port 8080');
     });
   })
-  .catch(err => {
+  .catch((err) => {
     console.error(err);
-  })
+  });
