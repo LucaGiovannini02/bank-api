@@ -5,7 +5,9 @@ import app from './app';
 import mongoose from 'mongoose';
 mongoose.set('debug', true);
 mongoose
-  .connect(process.env.HOST_DB) //da definire
+  .connect(
+    'mongodb+srv://davidcavaliere:J4ZMZVpQaZEJhAzt@cluster0.v7sehle.mongodb.net/ProjectWork?retryWrites=true&w=majority'
+  ) //da definire
   .then((_) => {
     console.log('Connected to db');
     app.listen(8080, () => {
