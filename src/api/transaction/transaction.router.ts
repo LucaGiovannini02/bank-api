@@ -16,7 +16,7 @@ router.post('/phone-recharge', phoneRecharge);
 
 router.get('/balance', getAccountBalance);
 
-router.get('/transactions/:transactionId', getTransactionDetails);
+router.get('/:transactionId', getTransactionDetails);
 router.get('', getTransactionsWithFilters);
 
 export default router;

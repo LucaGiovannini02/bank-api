@@ -9,8 +9,8 @@ export interface Transaction {
   phoneNumber?: string;
   date?: Date;
   description?: string;
-  sender?: iBankAccount | Types.ObjectId;
-  receiver?: iBankAccount | Types.ObjectId;
-  transactionCategory?: iCategory | Types.ObjectId;
-  bankAccountID?: iBankAccount | Types.ObjectId;
+  sender?: iBankAccount | Types.ObjectId | string;
+  receiver?: iBankAccount | Types.ObjectId | string;
+  transactionCategory?: iCategory | Types.ObjectId | string;
+  bankAccountID?: iBankAccount | Types.ObjectId | string;
 }

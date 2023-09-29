@@ -11,18 +11,17 @@ export const createBankTransfer = async (
   next: NextFunction
 ) => {
   try {
-    const { senderIBAN, receiverIBAN, amount } = req.body;
+    const bankAccount = await bankAccountService.getByUser(req.user!.id!);
+
+    const { receiverIBAN, amount } = req.body;
 
     // Assuming you have a createTransaction method in your service
     const transaction: iTransaction[] = await TransactionService.bankTransfer(
-      senderIBAN,
+      bankAccount?.iban!,
       receiverIBAN,
       amount
     );
-    const senderAccount = await BankAccount.findOne({ iban: senderIBAN });
-    let userId = senderAccount?.user?.toString();
-    if(userId == undefined){ userId = "null" };
-    await logService.addBankTransferLog(userId, req.ip, true);
+    await logService.addBankTransferLog(req.user?.id!, req.ip, true);
     res.status(201).json(transaction);
   } catch (error) {
     next(error);
@@ -35,15 +34,15 @@ export const phoneRecharge = async (
   next: NextFunction
 ) => {
   try {
-    const { phoneNumber, senderIban, amount } = req.body;
-    const phoneRecharge: iTransaction[] =
-      await TransactionService.phoneRecharge(phoneNumber, senderIban, amount);
-    const senderAccount = await BankAccount.findOne({ iban: senderIban });
-    let userId = senderAccount?.user?.toString();
-    if (userId == undefined) {
-      userId = 'null';
-    }
-    await logService.addPhoneLog(userId, req.ip, true);
+    const { phoneNumber, amount } = req.body;
+    const bankAccount = await bankAccountService.getByUser(req.user!.id!);
+
+    const phoneRecharge: iTransaction = await TransactionService.phoneRecharge(
+      phoneNumber,
+      bankAccount?.id,
+      amount
+    );
+    await logService.addPhoneLog(req.user?.id!, req.ip, true);
     res.status(201).json(phoneRecharge);
   } catch (error) {
     next(error);
