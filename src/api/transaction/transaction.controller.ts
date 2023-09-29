@@ -19,7 +19,10 @@ export const createBankTransfer = async (
       receiverIBAN,
       amount
     );
-
+    const senderAccount = await BankAccount.findOne({ iban: senderIBAN });
+    let userId = senderAccount?.user?.toString();
+    if(userId == undefined){ userId = "null" };
+    await logService.addBankTransferLog(userId, req.ip, true);
     res.status(201).json(transaction);
   } catch (error) {
     next(error);
