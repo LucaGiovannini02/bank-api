@@ -163,6 +163,9 @@ export class TransactionService {
       const senderAccount = await BankAccount.findOne({ iban: senderIBAN });
       const receiverAccount = await BankAccount.findOne({ iban: receiverIBAN });
 
+      if (senderIBAN == receiverIBAN) {
+        throw new Error('Sender and receiver are the same');
+      }
       const senderLastTransaction = await Transaction.findOne({
         bankAccountID: senderAccount?._id,
       }).sort({ date: -1, _id: -1 }); // Sort by date and _id in descending order
