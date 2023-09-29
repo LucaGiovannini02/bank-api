@@ -3,6 +3,7 @@ import { Transaction as iTransaction } from './transaction.entity';
 import TransactionService from './transaction.service';
 import logService from '../log/log.service';
 import { BankAccount } from '../bank-account/bank-account.model';
+import bankAccountService from '../bank-account/bank-account.service';
 
 export const createBankTransfer = async (
   req: Request,
@@ -46,32 +47,17 @@ export const phoneRecharge = async (
   }
 };
 
-export const getTransactionsByBankAccount = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { bankAccountId } = req.params;
-    const transactions = await TransactionService.getTransactionsByBankAccount(
-      bankAccountId
-    );
-    res.status(200).json(transactions);
-  } catch (error) {
-    next(error);
-  }
-};
-
 export const getTransactionDetails = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const { bankAccountId, transactionId } = req.params;
+    const { transactionId } = req.params;
+    const bankAccount = await bankAccountService.getByUser(req.user!.id!);
 
     const transaction = await TransactionService.getTransactionDetails(
-      bankAccountId,
+      bankAccount!.id,
       transactionId
     );
 
@@ -91,10 +77,10 @@ export const getTransactionsWithFilters = async (
   next: NextFunction
 ) => {
   try {
-    const { bankAccountId } = req.params;
+    const bankAccount = await bankAccountService.getByUser(req.user!.id!);
 
     const transactions = await TransactionService.getTransactionsWithFilters(
-      bankAccountId,
+      bankAccount!.id,
       req.query
     );
 
@@ -110,10 +96,10 @@ export const getAccountBalance = async (
   next: NextFunction
 ) => {
   try {
-    const { bankAccountId } = req.params;
+    const bankAccount = await bankAccountService.getByUser(req.user!.id!);
 
     // Call the service method to get the balance
-    const balance = await TransactionService.getBalance(bankAccountId);
+    const balance = await TransactionService.getBalance(bankAccount!.id);
 
     if (balance === null) {
       return res

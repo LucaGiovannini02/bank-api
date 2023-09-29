@@ -4,7 +4,7 @@ import { Transaction as ITransaction } from './transaction.entity';
 export const transactionSchema = new Schema<ITransaction>({
   amount: Number,
   balance: Number,
-  date: Date,
+  date: { type: Date, default: Date.now },
   description: String,
   phoneNumber: String,
   sender: { type: Schema.Types.ObjectId, ref: 'BankAccount' },

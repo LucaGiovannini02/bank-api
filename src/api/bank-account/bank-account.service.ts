@@ -11,6 +11,10 @@ export class BankAccountService {
     let newBankAccount = await BankAccountModel.create({ ...bankAccount });
     return await newBankAccount.populate(['user']);
   }
+
+  async getByUser(userId: string) {
+    return BankAccountModel.findOne({ user: userId });
+  }
 }
 
 export default new BankAccountService();

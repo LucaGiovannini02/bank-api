@@ -3,6 +3,7 @@ import { BankAccount } from '../bank-account/bank-account.model';
 import { Transaction as iTransaction } from './transaction.entity';
 import { Transaction } from './transaction.model';
 import logService from '../log/log.service';
+import { last } from 'lodash';
 
 function randomDepositAmount(minAmount: number, maxAmount: number) {
   const randomAmount =
@@ -51,7 +52,8 @@ export class TransactionService {
 
       const transactions = await Transaction.find(q)
         .limit(query.number || 0)
-        .sort({ date: -1 });
+        .sort({ date: -1 })
+        .populate(['sender', 'receiver']);
 
       return transactions;
     } catch (error) {
