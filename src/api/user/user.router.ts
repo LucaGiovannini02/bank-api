@@ -4,7 +4,6 @@ import { isAuthenticated } from '../../utils/auth/authenticated.middleware';
 
 const router = Router();
 
-router.use(isAuthenticated);
 router.get('/me', isAuthenticated, me);
 router.get('/', usersList);
 

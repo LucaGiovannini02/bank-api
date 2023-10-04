@@ -5,7 +5,7 @@
     "outDir": "dist",
     "strict": false,
     "esModuleInterop": true,
-    "moduleResolution": "Node",
+    "moduleResolution": "node",
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "noImplicitAny": false,
