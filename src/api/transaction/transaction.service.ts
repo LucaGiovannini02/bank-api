@@ -1,12 +1,7 @@
-import { FilterQuery, Query } from 'mongoose';
+import { FilterQuery } from 'mongoose';
 import { BankAccount } from '../bank-account/bank-account.model';
 import { Transaction as iTransaction } from './transaction.entity';
-import { Transaction, transactionSchema } from './transaction.model';
-import logService from '../log/log.service';
-import { last } from 'lodash';
-import { User } from '../user/user.model';
-import bankAccountService from '../bank-account/bank-account.service';
-import { tr } from 'date-fns/locale';
+import { Transaction } from './transaction.model';
 import { QueryTransactionsDTO } from './transaction.dto';
 
 function randomDepositAmount(minAmount: number, maxAmount: number) {
@@ -121,7 +116,7 @@ export class TransactionService {
         date: new Date(),
         sender: bankAccount,
         receiver: bankAccount,
-        transactionCategory: 'cash deposit',
+        transactionCategory: 'cash_deposit',
         bankAccountID: bankAccount._id,
       });
 
@@ -149,7 +144,7 @@ export class TransactionService {
         date: new Date(),
         sender: bankAccount,
         receiver: bankAccount,
-        transactionCategory: 'apertura conto',
+        transactionCategory: 'account_opening',
         bankAccountID: bankAccount._id,
       });
 
@@ -208,7 +203,7 @@ export class TransactionService {
         date: new Date(),
         sender: senderAccount,
         receiver: receiverAccount,
-        transactionCategory: 'outgoing bank transfer',
+        transactionCategory: 'outgoing_bank_transfer',
         bankAccountID: senderAccount?._id,
       });
 
@@ -218,7 +213,7 @@ export class TransactionService {
         date: new Date(),
         sender: senderAccount,
         receiver: receiverAccount,
-        transactionCategory: 'incoming bank transfer',
+        transactionCategory: 'incoming_bank_transfer',
         bankAccountID: receiverAccount?._id,
       });
 
