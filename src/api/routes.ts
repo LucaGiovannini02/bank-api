@@ -5,7 +5,6 @@ import logRouter from './log/log.router';
 
 const router = Router();
 
-router.use('/operations', transactionRouter);
 router.use('/transactions', transactionRouter);
 router.use(authRouter);
 router.use('/log', logRouter);
