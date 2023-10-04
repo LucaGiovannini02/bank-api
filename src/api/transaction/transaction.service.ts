@@ -85,7 +85,9 @@ export class TransactionService {
         bankAccountId
       );
 
-      const transaction = transactions.find((t) => t.id === transactionId);
+      const transaction = await transactions
+        .find((t) => t.id === transactionId)
+        .populate('sender', 'receiver');
 
       return transaction;
     } catch (error) {

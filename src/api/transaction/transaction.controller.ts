@@ -69,7 +69,7 @@ export const getTransactionDetails = async (
       return res.status(404).json({ message: 'Transaction not found' });
     }
 
-    res.status(200).json(transaction);
+    res.status(200).json({ transaction });
   } catch (error) {
     next(error);
   }
