@@ -8,6 +8,8 @@ import {
   getTransactionsWithFilters,
   getAccountBalance,
 } from './transaction.controller';
+import { validate } from '../../utils/validation.middleware';
+import { QueryTransactionsDTO } from './transaction.dto';
 
 const router = Router();
 router.use(isAuthenticated);
@@ -17,6 +19,10 @@ router.post('/phone-recharge', phoneRecharge);
 router.get('/balance', getAccountBalance);
 
 router.get('/:transactionId', getTransactionDetails);
-router.get('', getTransactionsWithFilters);
+router.get(
+  '',
+  validate(QueryTransactionsDTO, 'query'),
+  getTransactionsWithFilters
+);
 
 export default router;

@@ -7,6 +7,7 @@ import { last } from 'lodash';
 import { User } from '../user/user.model';
 import bankAccountService from '../bank-account/bank-account.service';
 import { tr } from 'date-fns/locale';
+import { QueryTransactionsDTO } from './transaction.dto';
 
 function randomDepositAmount(minAmount: number, maxAmount: number) {
   const randomAmount =
@@ -42,7 +43,7 @@ export class TransactionService {
 
   async getTransactionsWithFilters(
     bankAccount: string,
-    query: any
+    query: QueryTransactionsDTO
   ): Promise<iTransaction[]> {
     try {
       const q: FilterQuery<iTransaction> = {
@@ -53,7 +54,9 @@ export class TransactionService {
         q.transactionCategory = query.category;
       }
 
-      q.date = q.date || {};
+      if (query.startDate !== undefined || query.endDate !== undefined) {
+        q.date = {};
+      }
 
       if (query.startDate) {
         q.date['$gte'] = new Date(query.startDate);
@@ -67,6 +70,8 @@ export class TransactionService {
         .limit(query.number || 0)
         .sort({ date: -1 })
         .populate(['sender', 'receiver']);
+
+      console.log(q);
 
       return transactions;
     } catch (error) {

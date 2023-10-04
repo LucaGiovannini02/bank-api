@@ -4,6 +4,8 @@ import TransactionService from './transaction.service';
 import logService from '../log/log.service';
 import { BankAccount } from '../bank-account/bank-account.model';
 import bankAccountService from '../bank-account/bank-account.service';
+import { TypedRequest } from '../../utils/typed-request.interface';
+import { QueryTransactionsDTO } from './transaction.dto';
 
 export const createBankTransfer = async (
   req: Request,
@@ -74,7 +76,7 @@ export const getTransactionDetails = async (
 };
 
 export const getTransactionsWithFilters = async (
-  req: Request,
+  req: TypedRequest<any, QueryTransactionsDTO>,
   res: Response,
   next: NextFunction
 ) => {
